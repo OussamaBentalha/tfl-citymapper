@@ -1,6 +1,5 @@
 package com.android.sam.citymapper.ui.station
 
-import android.widget.Toast
 import com.android.sam.citymapper.data.tfl.TflApi
 import com.android.sam.citymapper.data.tfl.models.StopPointResponse
 import com.android.sam.citymapper.ui.Navigator
@@ -17,12 +16,13 @@ class StationPresenter(val view: StationContract.View,
 
     lateinit var stationViewModels:MutableList<StationViewModel>
 
+
     override fun checkLocation() {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun fetchStation() {
-        tflApi.getNearbyStations("51.5267869", "-0.045426")
+        tflApi.getNearbyStations("51.5267869", "-0.045426").repeat(30000)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe( { result -> subscriberFetchStation(result)
                      })

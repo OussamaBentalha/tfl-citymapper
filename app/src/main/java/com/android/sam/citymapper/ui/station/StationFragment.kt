@@ -1,5 +1,10 @@
 package com.android.sam.citymapper.ui.station
 
+import android.annotation.SuppressLint
+import android.content.Context
+import android.location.Location
+import android.location.LocationListener
+import android.location.LocationManager
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
@@ -29,6 +34,8 @@ class StationFragment : BaseMvpFragment<StationContract.View, StationPresenter>(
 
     lateinit var adapter: StationAdapter
 
+    private var locationManager : LocationManager? = null
+
     override fun provideOverridingModule() = Kodein.Module {
         bind<StationContract.View>() with instance(this@StationFragment)
     }
@@ -36,15 +43,19 @@ class StationFragment : BaseMvpFragment<StationContract.View, StationPresenter>(
     override fun onCreate(savedInstanceState: Bundle?) {
         initializeInjector()
         super.onCreate(savedInstanceState)
+
+        locationManager = getContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         return inflater.inflate(defaultLayout, container, false)
     }
 
+    @SuppressLint("MissingPermission")
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        mPresenter.fetchStation()
+        locationManager?.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0L, 0f, locationListener);
+        //mPresenter.fetchStation()
     }
 
     override fun onResume() {
@@ -67,6 +78,15 @@ class StationFragment : BaseMvpFragment<StationContract.View, StationPresenter>(
 
     override fun onClickItems(position: Int) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    private val locationListener: LocationListener = object : LocationListener {
+        override fun onLocationChanged(location: Location) {
+            Toast.makeText(context, "${location.longitude} : ${location.latitude}", Toast.LENGTH_SHORT).show();
+        }
+        override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {}
+        override fun onProviderEnabled(provider: String) {}
+        override fun onProviderDisabled(provider: String) {}
     }
 
     override fun onDestroy() {
